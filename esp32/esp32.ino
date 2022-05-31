@@ -5,6 +5,10 @@ MPU6050 accelgyro;
 int16_t ax, ay, az;
 int16_t gx, gy, gz;
 
+unsigned long active_value, step_number = 0;
+unsigned long k = 3000;
+boolean isEmergncy = false;
+
 void setup() 
 {
   // 시리얼 설정
@@ -20,21 +24,53 @@ void setup()
 
 void loop() 
 {
-  // 자이로 값 받아와서 출력하기
+  // 가속도 센서 측정
   accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
 
-  Serial.print(ax); Serial.print(",");
-  Serial.print(ay); Serial.print(",");
-  Serial.print(az); Serial.print(",");
-  Serial.print(gx); Serial.print(",");
-  Serial.print(gy); Serial.print(",");
-  Serial.print(gz); Serial.print(",");
+  if (abs(ax) > k)
+  {
+    active_value = active_value + abs(ax);
+    delay(1000);
+  }
+
+   if (abs(ay) > k)
+  {
+    active_value = active_value + abs(ay);
+    delay(1000);
+  }
+
+   if (abs(az) > k)
+  {
+    active_value = active_value + abs(az);
+    delay(1000);
+  }
+
+  if (// 압전센서 sensing 없을 때)
+    {
+      if (active_value > 3000)
+      {
+        if (// 압전센서 sensing 없을 때)
+          {
+            isEmergency = true;
+          }
+      }
+    }
+
+
+
+  // 활동량 출력
+  Serial.println(active_value);
+  delay(100);
 
   Serial.println("");
+  delay(1000);
 
+
+  
+  
   // GPS 값 받아와서 출력하기
-  if(Serial2.available())
-  {
-    Serial.write(Serial2.read());
-  }
+//  if(Serial2.available())
+//  {
+//    Serial.write(Serial2.read());
+//  }
 }
